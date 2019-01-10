@@ -1,25 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Modified by Peter Nichols at www.itdiscovery.info
 # Original Code from Tim Waizenegger in Stuttgardt
 # https://github.com/timwaizenegger/raspberrypi-examples
 # actor-led-7segment-4numbers/tm1637.py
 
 import math
 import RPi.GPIO as IO
-import threading
-from time import sleep, localtime
-# from tqdm import tqdm
+from time import sleep
 
-# IO.setwarnings(False)
+IO.setwarnings(False)
 IO.setmode(IO.BCM)
 
-HexDigits = [0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d,
-             0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71]
+# Array for display 0,1,2,3,4,5,6,7,8,9,A,b,C,d,E,F,blank
+#                   Top,Up Right,Low Right,Bot,Bot Left,Top Left,Minus
+#                   L,o,P,u,r
+HexDigits = [0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F, 
+        0x77,0x7C,0x39,0x5E,0x79,0x71,0x00,
+        0x01,0x02,0x04,0x08,0x10,0x20,0x21,0x40,
+        0x38,0x5C,0x73,0x1C,0x50]
 
 ADDR_AUTO = 0x40
 ADDR_FIXED = 0x44
 STARTADDR = 0xC0
-# DEBUG = False
 
 
 class TM1637:
@@ -38,7 +41,6 @@ class TM1637:
 
     def cleanup(self):
         # Stop updating clock, turn off display, and cleanup GPIO
-        self.StopClock()
         self.Clear()
         IO.cleanup()
 
@@ -58,6 +60,16 @@ class TM1637:
         self.Clear()
         for i in range(0, len(s)):
             self.Show1(i, int(s[i]))
+            
+    def Show2Comp(self,i):
+        self.Clear()
+        if i < 0:
+            self.Show1(0,24)
+            s='{:03d}'.format(int(i)*-1)
+        else:
+            s='{:03d}'.format(int(i))
+        for i in range(0,3):
+                self.Show1(i+1, int(s[i]))
 
     def Show(self, data):
         for i in range(0, 4):
@@ -161,35 +173,42 @@ class TM1637:
 
 if __name__ == "__main__":
     # Confirm the display operation
-    display = TM1637(CLK=20, DIO=21, brightness=1.0)
+    display = TM1637(CLK=21, DIO=22, brightness=1.0)
 
     display.Clear()
-
-    digits = [1, 2, 3, 4]
+    print("Displaying all 8's")
+    digits = [8,8,8,8]
     display.Show(digits)
-
+    sleep(2)
     print ("Updating one digit at a time:")
     display.Clear()
-    display.Show1(0,4)
+    display.Show1(0,1)
     sleep(1)
-    display.Show1(1, 3)
+    display.Show1(1,2)
     sleep(1)
-    display.Show1(2, 2)
+    display.Show1(2,3)
     sleep(1)
-    display.Show1(3, 1)
-    sleep(1)
+    display.Show1(3,4)
+    sleep(2)
+    print("Show 2's compliment - negative\n")
+    display.Show2Comp(-987)
+    sleep(3)
+    print("Show 2's compliment - positive")
+    display.Show2Comp(456)
+    sleep(3)
 
-    print ("Add double point\n")
+    print("Add double point\n")
     display.ShowDoublepoint(True)
     sleep(2)
-    print ("Brightness Off")
+    print("Brightness Off")
     display.SetBrightness(0)
     sleep(1)
-    print ("Full Brightness")
+    print("Full Brightness")
     display.SetBrightness(1)
     sleep(1)
-    print ("30% Brightness")
+    print("30% Brightness")
     display.SetBrightness(0.1)
     sleep(2)
+    print("Clearing Display")
     display.Clear()
-    # See clock.py for how to use the clock functions!
+    display.cleanup()
