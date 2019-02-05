@@ -173,7 +173,7 @@ class TM1637:
 
 if __name__ == "__main__":
     # Confirm the display operation
-    display = TM1637(CLK=21, DIO=22, brightness=1.0)
+    display = TM1637(CLK=20, DIO=21, brightness=3.0)
 
     display.Clear()
     print("Displaying all 8's")
