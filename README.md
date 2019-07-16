@@ -1,5 +1,5 @@
 # tm1637
-Library to use multiple tm367s on a Raspberry Pi
+Library to use multiple tm1637s on a Raspberry Pi
 
 Connection
 
