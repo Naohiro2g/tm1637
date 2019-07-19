@@ -1,4 +1,7 @@
 # tm1637
+
+TM1637 seems to have I2C connectivity but it's not. Doesn't have slave address, and is LSB first like UART, not MSB first. 
+
 Library to use multiple tm1637s on a Raspberry Pi
 
 Connection
